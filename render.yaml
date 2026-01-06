@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: whatsappbot
+    env: node
+    plan: free
+    repo: https://github.com/mazenelashkar/WHATSAPPBOT
+    branch: main
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true
