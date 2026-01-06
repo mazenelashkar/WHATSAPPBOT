@@ -1,37 +1,36 @@
-// Import Express.js
-const express = require('express');
+# WHATSAPPBOT
 
-// Create an Express app
-const app = express();
+A small WhatsApp webhook receiver example using Express.
 
-// Middleware to parse JSON bodies
-app.use(express.json());
+## Setup
 
-// Set port and verify_token
-const port = process.env.PORT || 3000;
-const verifyToken = process.env.VERIFY_TOKEN;
+1. Copy `.env.example` to `.env` and edit:
 
-// Route for GET requests
-app.get('/', (req, res) => {
-  const { 'hub.mode': mode, 'hub.challenge': challenge, 'hub.verify_token': token } = req.query;
+```
+cp .env.example .env
+# then edit .env and set VERIFY_TOKEN
+```
 
-  if (mode === 'subscribe' && token === verifyToken) {
-    console.log('WEBHOOK VERIFIED');
-    res.status(200).send(challenge);
-  } else {
-    res.status(403).end();
-  }
-});
+2. Install dependencies:
 
-// Route for POST requests
-app.post('/', (req, res) => {
-  const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-  console.log(`\n\nWebhook received ${timestamp}\n`);
-  console.log(JSON.stringify(req.body, null, 2));
-  res.status(200).end();
-});
+```
+npm install
+```
 
-// Start the server
-app.listen(port, () => {
-  console.log(`\nListening on port ${port}\n`);
-});
+3. Run in development (reloads with changes):
+
+```
+npm run dev
+```
+
+4. Run tests:
+
+```
+npm test
+```
+
+## Notes
+
+- The app reads `VERIFY_TOKEN` from environment variables and exposes a GET endpoint for webhook verification and a POST endpoint for incoming events.
+- Use `ngrok` or a similar tunneling tool to expose `http://localhost:3000/` to the public internet for webhook callbacks.
+
