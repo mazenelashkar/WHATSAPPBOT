@@ -18,12 +18,24 @@ app.get('/', (req, res) => {
   const { 'hub.mode': mode, 'hub.challenge': challenge, 'hub.verify_token': token } = req.query;
   const verifyToken = process.env.VERIFY_TOKEN;
 
-  if (mode === 'subscribe' && token === verifyToken) {
-    console.log('WEBHOOK VERIFIED');
-    res.status(200).send(challenge);
-  } else {
-    res.status(403).end();
+  // Webhook verification request
+  if (mode === 'subscribe') {
+    if (token === verifyToken) {
+      console.log('WEBHOOK VERIFIED');
+      res.status(200).send(challenge);
+    } else {
+      res.status(403).end();
+    }
+    return;
   }
+
+  // If it's not a verification request, treat it as a health check and return 200
+  res.status(200).json({ status: 'ok' });
+});
+
+// Simple health check endpoint used by Render (returns 200)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
 });
 
 // Route for POST requests
@@ -38,6 +50,15 @@ app.post('/', (req, res) => {
   }
 
   res.status(200).json({ status: 'received' });
+});
+
+// Debug endpoint to identify deployed commit/branch
+app.get('/whoami', (req, res) => {
+  res.json({
+    commit: process.env.RENDER_GIT_COMMIT || process.env.GIT_COMMIT || 'unknown',
+    branch: process.env.RENDER_GIT_BRANCH || process.env.GIT_BRANCH || 'unknown',
+    time: new Date().toISOString()
+  });
 });
 
 // Export app for testing and start server only when run directly
