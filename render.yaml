@@ -7,5 +7,5 @@ services:
     branch: main
     buildCommand: npm ci
     startCommand: npm start
-    healthCheckPath: /
+    healthCheckPath: /health
     autoDeploy: true
